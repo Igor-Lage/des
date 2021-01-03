@@ -11,11 +11,12 @@ int **sbox_creation(int type){
 		exit(-1);
 	}
 	int i, j, d, u;
-	for (i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++){
 		if ((sbox[i] = (int *)malloc(16 * sizeof(int))) == NULL){
 			perror("Memory allocation failed. Exit.\n");
 			exit(-1);
 		}
+	}
 
 	//We'll be using eight text files that contain the values of each slot of each sbox, 
 	//in order to fill them.
@@ -44,11 +45,13 @@ int **sbox_creation(int type){
 		exit(-1);
 	}
 
-	for (i = 0; i < 4; i++)
-		for (j = 0; j < 16; j++)
-            d = fgetc(f) - '0'; //To retrieve the actual integer and not an ASCII code
-            u = fgetc(f) - '0';
-			sbox[i][j] = d*10+u; 
+	for (i = 0; i < 4; i++){
+		for (j = 0; j < 16; j++){
+          		d = fgetc(f) - '0'; //To retrieve the actual integer and not an ASCII code
+            		u = fgetc(f) - '0';
+			sbox[i][j] = d*10+u; //All numbers are written with 2 digits in the sboxes (for example 14 is 14 and 4 is 04)
+		}
+	}
 	fclose(f);
 	return(sbox);
 
@@ -61,14 +64,14 @@ u_int64_t sbox_mapping(u_int64_t block, int box){
     u_int8_t result_line = 0;
     u_int8_t result_column = 0;
     if(copy & (1 << 5)) {
-        result_line |= 2;
+        result_line |= 2; //00000010
     }
     copy = block;
     if(copy & 1){
-        result_line |= 1;
+        result_line |= 1; //00000001
     }
     copy = block;
-    if((copy &(15 << 1)) >> 1){
+    if((copy &(15 << 1)) >> 1){ //15=00001111, we use it to get 4 digits, the 2nd, 3rd, 4th, and 5th
         result_column |= ((copy &(15 << 1)) >> 1);
     }
 
@@ -97,7 +100,7 @@ u_int64_t f (u_int32_t R, u_int64_t K)
 u_int64_t six_bit_select (u_int64_t key, int part)
 {
 	u_int64_t result = 0;
-	result|= (key & 63 << 6*(7-part)) >> 6*(7-part);
+	result|= (key & 63 << 6*(7-part)) >> 6*(7-part); // 63 = 00...0111111
 	return result;
 }
 
@@ -115,6 +118,6 @@ u_int64_t lr_gen(u_int64_t IP, u_int64_t* K_list)
 		R[i]=L[i-1] ^ f(R[i-1], K_list[i]);
 	}
 	u_int64_t result = 0;
-	result = ((result | R[16]) << 32 ) | L[16];
+	result = ((result | R[16]) << 32 ) | L[16]; //to return R16L16
 	return result;
 }
