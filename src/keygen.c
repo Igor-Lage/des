@@ -121,8 +121,9 @@ u_int64_t permutation(u_int64_t key, int perm){
 void print_bits(u_int64_t word, int range){
 
 	int i;
-	for (i = range - 1 ; i >= 0; i--)
+	for (i = range - 1 ; i >= 0; i--){
 		putchar(word & (1 << i) ? '1' : '0');
+	}
 	printf("\n");
 
 }
@@ -182,12 +183,12 @@ u_int64_t* sixteen_key_generation(u_int64_t key){
     int i;
     u_int32_t C_zero = leftmost_twenty_eight_bits(key);
     u_int32_t D_zero = rightmost_twenty_eight_bits(key);
-    u_int32_t* C_list[16] = sixteen_shift(C_Zero);
-    u_int32_t* D_list[16] = sixteen_shift(D_Zero);
-    u_int64_t* K_list[16];
+    u_int32_t* C_list = sixteen_shift(C_zero);
+    u_int32_t* D_list = sixteen_shift(D_zero);
+    u_int64_t K_list[16];
 
     for(i=0; i< 16; i++){
-        K_list[i]= (C_list[i+1] << 28) | D_list[i+1]);
+      K_list[i]= (C_list[i+1] << 28) | D_list[i+1];
         K_list[i]= permutation(K_list[i], 48);
     }
 
@@ -196,7 +197,7 @@ u_int64_t* sixteen_key_generation(u_int64_t key){
 
 u_int32_t* sixteen_shift(u_int32_t key){
 
-    u_int32_t* result[17];
+    u_int32_t result[17];
     result[0] = key;
     result[1] = shift(result[0]);
     result[2] = shift(result[1]);
@@ -218,13 +219,13 @@ u_int32_t* sixteen_shift(u_int32_t key){
     return result;
 }
 
-u_int32_t shift(u_int32_key){
+u_int32_t shift(u_int32_t key){
 
     u_int32_t copy = key;
     u_int32_t leftmost = 0;
     if((copy & (1<<27)) >> 27){
         leftmost=1;
     }
-    (copy << 1)|= leftmost;
+    copy = (copy << 1)| leftmost;
     return copy;
 }

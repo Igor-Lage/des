@@ -19,9 +19,10 @@ int main(){
 
 	//64-bit key
 	u_int64_t key = 1383827165325090801;
-	plaintext = rand() %(2^64 -1); //This will generate a number between 2^0 and 2^8 - 1
+	plaintext = 4;
 	printf("The randomly generated plaintext is ");
 	print_bits(plaintext, 64);
+	printf("Test");
 
 	// encryption of the plaintext
 	ciphertext = des_ciphertext(plaintext, key);

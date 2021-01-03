@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "fk.h"
+#include "keygen.h"
 
 int **sbox_creation(int type){
 
@@ -76,20 +77,21 @@ u_int64_t sbox_mapping(u_int64_t block, int box){
 
 u_int64_t f (u_int32_t R, u_int64_t K)
 {
-	u_int64_t perm = permutation (R, 5);
+  u_int64_t result;
+  u_int64_t perm = permutation (R, 5);
 	u_int64_t KplusE = perm ^ K;
-	SBone = sbox_mapping(six_bit_select(KplusE, 0), 0) << 28;
-	SBtwo = sbox_mapping(six_bit_select(KplusE, 1), 1) << 24;
-	SBthree = sbox_mapping(six_bit_select(KplusE, 2), 2) << 20;
-	SBfour = sbox_mapping(six_bit_select(KplusE, 3), 3) << 16;
-	SBfive = sbox_mapping(six_bit_select(KplusE, 4), 4) << 12;
-	SBsix = sbox_mapping(six_bit_select(KplusE, 5), 5) << 8;
-	SBseven = sbox_mapping(six_bit_select(KplusE, 6), 6) << 4;
-	SBeight = sbox_mapping(six_bit_select(KplusE, 7), 7);
+	u_int64_t SBone = sbox_mapping(six_bit_select(KplusE, 0), 0) << 28;
+	u_int64_t SBtwo = sbox_mapping(six_bit_select(KplusE, 1), 1) << 24;
+	u_int64_t SBthree = sbox_mapping(six_bit_select(KplusE, 2), 2) << 20;
+	u_int64_t SBfour = sbox_mapping(six_bit_select(KplusE, 3), 3) << 16;
+	u_int64_t SBfive = sbox_mapping(six_bit_select(KplusE, 4), 4) << 12;
+	u_int64_t SBsix = sbox_mapping(six_bit_select(KplusE, 5), 5) << 8;
+	u_int64_t SBseven = sbox_mapping(six_bit_select(KplusE, 6), 6) << 4;
+	u_int64_t SBeight = sbox_mapping(six_bit_select(KplusE, 7), 7);
 	
 	u_int64_t resultat = SBone | SBtwo | SBthree | SBfour | SBfive | SBsix | SBseven | SBeight;
 	result = permutation(resultat, 32);
-	return result
+	return result;
 }
 
 u_int64_t six_bit_select (u_int64_t key, int part)
@@ -107,12 +109,12 @@ u_int64_t lr_gen(u_int64_t IP, u_int64_t* K_list)
 	u_int32_t R[17];
 	R[0]=rightmost_thirty_two_bits(IP);
 
-	for(i=1; i=<16; i++)
+	for(i=1; i<=16; i++)
 	{
 		L[i]=R[i-1];
 		R[i]=L[i-1] ^ f(R[i-1], K_list[i]);
 	}
 	u_int64_t result = 0;
-	u_int64_t result = ((result | R[16]) << 32 ) | L[16];
+	result = ((result | R[16]) << 32 ) | L[16];
 	return result;
 }

@@ -6,8 +6,8 @@
 u_int64_t des_ciphertext(u_int64_t plaintext, u_int64_t key){
 
 	//Generation of the sixteen subkeys
-	u_int64_t subkeys[16];
-    subkeys = sixteen_key_generation(u_int64_t key);
+	u_int64_t* subkeys;
+    subkeys = sixteen_key_generation(key);
 
 	u_int64_t ciphertext = permutation(plaintext, 64);
     ciphertext = lr_gen(ciphertext, subkeys);
@@ -19,10 +19,10 @@ u_int64_t des_ciphertext(u_int64_t plaintext, u_int64_t key){
 u_int64_t des_plaintext(u_int64_t ciphertext, u_int64_t key){
 
 	//Generation of the sixteen subkeys
-	u_int64_t subkeys[16];
-	u_int64_t subkeys_inverse[16];
+	u_int64_t* subkeys;
+	u_int64_t* subkeys_inverse;
 	int i;
-    subkeys = sixteen_key_generation(u_int64_t key);
+    subkeys = sixteen_key_generation(key);
 
 	for(i=0; i<16; i++)
 	{
