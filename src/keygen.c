@@ -188,7 +188,7 @@ u_int64_t* sixteen_key_generation(u_int64_t key){
     u_int64_t K_list[16];
 
     for(i=0; i< 16; i++){
-      K_list[i]= (C_list[i+1] << 28) | D_list[i+1];
+      K_list[i]= (C_list[i+1] << 28) | D_list[i+1]; //K0 = C1D1 for example
         K_list[i]= permutation(K_list[i], 48);
     }
 
@@ -224,7 +224,7 @@ u_int32_t shift(u_int32_t key){
     u_int32_t copy = key;
     u_int32_t leftmost = 0;
     if((copy & (1<<27)) >> 27){
-        leftmost=1;
+        leftmost=1; //save the 28th bit(the leftmost one), the one that cycle to the end(since we're working on 28bit keys)
     }
     copy = (copy << 1)| leftmost;
     return copy;
