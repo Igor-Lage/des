@@ -19,7 +19,7 @@ int main(){
 
 	//64-bit key
 	u_int64_t key = 1383827165325090801;
-	plaintext = rand() %18446744073709551616; //(2^64 -1)
+	plaintext = rand() %0xFFFFFFFFFFFFFFFF; //(2^64 -1)
 	printf("The randomly generated plaintext is ");
 	print_bits(plaintext, 64);
 
