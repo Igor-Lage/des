@@ -6,6 +6,7 @@ u_int64_t permutation(u_int64_t key, int perm){
 
 	int i;
 	u_int64_t result = 0;
+	u_int64_t masque = 1;
 
 	//PC-1
 	if (perm == 56){
@@ -19,7 +20,7 @@ u_int64_t permutation(u_int64_t key, int perm){
                                 21, 13, 5, 28, 20, 12, 4};
 		for (i = 0; i < 56; i++){
 			result <<= 1;
-			if (key & (1 << 56 - perm_table[i]))
+			if (key & (masque << 64 - perm_table[i]))
 			result |= 1;
 		}
     }
@@ -36,7 +37,7 @@ u_int64_t permutation(u_int64_t key, int perm){
                         46, 42, 50, 36, 29, 32};
         for (i = 0; i < 48; i++){
 			result <<= 1;
-			if (key & (1 << 48 - perm_table[i]))
+			if (key & (masque << 56 - perm_table[i]))
 			result |= 1;
 		}
     }
@@ -53,7 +54,7 @@ u_int64_t permutation(u_int64_t key, int perm){
                             63, 55, 47, 39, 31, 23, 15, 7};
         for (i = 0; i < 64; i++){
             result <<=1;
-            if (key & (1 << 64 - perm_table[i]))
+            if (key & (masque << 64 - perm_table[i]))
 			result |= 1;
         }
     }    
@@ -70,7 +71,7 @@ u_int64_t permutation(u_int64_t key, int perm){
                         33, 1, 41, 9, 49, 17, 57, 25};
         for (i = 0; i < 64; i++){
             result <<=1;
-            if (key & (1 << 64 - perm_table[i]))
+            if (key & (masque << 64 - perm_table[i]))
             result |= 1;
         }
     }
@@ -87,7 +88,7 @@ u_int64_t permutation(u_int64_t key, int perm){
                         28, 29, 30, 31, 32, 1};
         for (i = 0; i < 48; i++){
             result <<=1;
-            if (key & (1 << 48 - perm_table[i]))
+            if (key & (masque << 32 - perm_table[i]))
             result |= 1;
         }
     }
@@ -104,7 +105,7 @@ u_int64_t permutation(u_int64_t key, int perm){
                         22, 11, 4, 25};
         for (i = 0; i < 32; i++){
             result <<=1;
-            if (key & (1 << 32 - perm_table[i]))
+            if (key & (masque << 32 - perm_table[i]))
             result |= 1;
         }
     }
@@ -121,17 +122,18 @@ u_int64_t permutation(u_int64_t key, int perm){
 void print_bits(u_int64_t word, int range){
 
 	int i;
+	u_int64_t masque = 1;
 	for (i = range - 1 ; i >= 0; i--){
-		putchar(word & (1 << i) ? '1' : '0');
+		putchar(word & (masque << i) ? '1' : '0');
 	}
 	printf("\n");
 
 }
 
-u_int64_t rightmost_twenty_eight_bits(u_int64_t word){
+u_int32_t rightmost_twenty_eight_bits(u_int64_t word){
 
 	int i;
-	u_int64_t rightmost_bits = 0;
+	u_int32_t rightmost_bits = 0;
 
 	for (i = 0; i < 28; i++)
 		if (word & (1 << i))
@@ -140,19 +142,20 @@ u_int64_t rightmost_twenty_eight_bits(u_int64_t word){
 	return (rightmost_bits);
 }
 
-u_int64_t leftmost_twenty_eight_bits(u_int64_t word){
+u_int32_t leftmost_twenty_eight_bits(u_int64_t word){
 
 	int i;
+	u_int64_t masque = 1;
 	u_int32_t leftmost_bits = 0;
 
 	for (i = 0; i < 28; i++)
-		if (word & (1 << 28 + i))
+		if (word & (masque << 28 + i))
 			leftmost_bits |= (1 << i);
 
 	return (leftmost_bits);
 }
 
-u_int64_t rightmost_thirty_two_bits(u_int64_t word){
+u_int32_t rightmost_thirty_two_bits(u_int64_t word){
 
 	int i;
 	u_int32_t rightmost_bits = 0;
@@ -166,13 +169,14 @@ u_int64_t rightmost_thirty_two_bits(u_int64_t word){
 
 
 
-u_int64_t leftmost_thirty_two_bits(u_int64_t word){
+u_int32_t leftmost_thirty_two_bits(u_int64_t word){
 
 	int i;
+	u_int64_t masque = 1;
 	u_int32_t leftmost_bits = 0;
 
 	for (i = 0; i < 32; i++)
-		if (word & (1 << 28 + i))
+		if (word & (masque << 32 + i))
 			leftmost_bits |= (1 << i);
 
 	return (leftmost_bits);
@@ -185,10 +189,14 @@ u_int64_t* sixteen_key_generation(u_int64_t key){
     u_int32_t D_zero = rightmost_twenty_eight_bits(key);
     u_int32_t* C_list = sixteen_shift(C_zero);
     u_int32_t* D_list = sixteen_shift(D_zero);
-    u_int64_t K_list[16];
+    u_int64_t *K_list = (u_int64_t*)malloc(16*sizeof(u_int64_t));
+	u_int64_t *intermediate = (u_int64_t*)malloc(16*sizeof(u_int64_t));
 
     for(i=0; i< 16; i++){
-      K_list[i]= (C_list[i+1] << 28) | D_list[i+1]; //K0 = C1D1 for example
+      K_list[i] = C_list[i+1];
+      K_list[i] = K_list[i] << 28;
+	intermediate[i] = D_list[i+1];
+      K_list[i] |= intermediate[i];    //K0 = C1D1 for example
         K_list[i]= permutation(K_list[i], 48);
     }
 
@@ -197,7 +205,7 @@ u_int64_t* sixteen_key_generation(u_int64_t key){
 
 u_int32_t* sixteen_shift(u_int32_t key){
 
-    u_int32_t result[17];
+    u_int32_t *result = (u_int32_t*)malloc(17*sizeof(u_int32_t));
     result[0] = key;
     result[1] = shift(result[0]);
     result[2] = shift(result[1]);
@@ -226,6 +234,6 @@ u_int32_t shift(u_int32_t key){
     if((copy & (1<<27)) >> 27){
         leftmost=1; //save the 28th bit(the leftmost one), the one that cycle to the end(since we're working on 28bit keys)
     }
-    copy = (copy << 1)| leftmost;
+    copy = ((copy << 1)| leftmost) & 4026531839; //11101111111111111111111111111111, we set the 29th bit to 0 since we use shift on 28bit sub keys only
     return copy;
 }

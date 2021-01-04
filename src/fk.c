@@ -92,15 +92,16 @@ u_int64_t f (u_int32_t R, u_int64_t K)
 	u_int64_t SBseven = sbox_mapping(six_bit_select(KplusE, 6), 6) << 4;
 	u_int64_t SBeight = sbox_mapping(six_bit_select(KplusE, 7), 7);
 	
-	u_int64_t resultat = SBone | SBtwo | SBthree | SBfour | SBfive | SBsix | SBseven | SBeight;
-	result = permutation(resultat, 32);
+	result = SBone | SBtwo | SBthree | SBfour | SBfive | SBsix | SBseven | SBeight;
+	result = permutation(result, 32);
 	return result;
 }
 
 u_int64_t six_bit_select (u_int64_t key, int part)
 {
+	u_int64_t masque = 63; // 63 = 00...0111111
 	u_int64_t result = 0;
-	result|= (key & 63 << 6*(7-part)) >> 6*(7-part); // 63 = 00...0111111
+	result|= ((key & (masque << 6*(7-part))) >> 6*(7-part)); 
 	return result;
 }
 
@@ -112,10 +113,10 @@ u_int64_t lr_gen(u_int64_t IP, u_int64_t* K_list)
 	u_int32_t R[17];
 	R[0]=rightmost_thirty_two_bits(IP);
 
-	for(i=1; i<=16; i++)
+	for(i=0; i<16; i++)
 	{
-		L[i]=R[i-1];
-		R[i]=L[i-1] ^ f(R[i-1], K_list[i]);
+		L[i+1]=R[i];
+		R[i+1]=L[i] ^ rightmost_thirty_two_bits(f(R[i], K_list[i]));
 	}
 	u_int64_t result = 0;
 	result = ((result | R[16]) << 32 ) | L[16]; //to return R16L16

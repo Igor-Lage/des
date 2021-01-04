@@ -18,10 +18,11 @@ int main(){
 	u_int64_t plaintext, ciphertext;
 
 	//64-bit key
-	u_int64_t key = 1383827165325090801;
-	plaintext = rand() %0xFFFFFFFFFFFFFFFF; //(2^64 -1)
+	u_int64_t key = 0x133457799BBCDFF1;
+	plaintext = 0x123456789ABCDEF; /*rand() % 0xFFFFFFFFFFFFFFFF; //(2^64 -1)*/
 	printf("The randomly generated plaintext is ");
-	print_bits(plaintext, 64);
+	print_bits(plaintext,64);
+
 
 	// encryption of the plaintext
 	ciphertext = des_ciphertext(plaintext, key);
@@ -32,6 +33,7 @@ int main(){
 	plaintext = des_plaintext(ciphertext, key);
 	printf("\nThe original plaintext is ");
 	print_bits(plaintext, 64);
+
 
 
 	return(0);
