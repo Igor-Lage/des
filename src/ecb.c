@@ -3,58 +3,130 @@
 #include <stdlib.h>
 #include "ecb.h"
 #include "des.h"
+#include "keygen.h"
 
-char* stringToBinary(char* s) {
-    if(s == NULL) return 0; /* no input string */
-    size_t len = strlen(s);
-    char *binary = malloc(len*8 + 1); // each char is one byte (8 bits) and + 1 at the end for null terminator
-    binary[0] = '\0';
-    for(size_t i = 0; i < len; ++i) {
-        char ch = s[i];
+u_int64_t stringToBinary(char* ch) {
+    u_int64_t masque = 1;
+    u_int64_t binary = 0;
+    for(size_t i = 0; i < 8; ++i) {
         for(int j = 7; j >= 0; --j){
-            if(ch & (1 << j)) {
-                strcat(binary,"1");
-            } else {
-                strcat(binary,"0");
+            if(ch[i] & (1 << j)) {
+                binary |= (masque << (8*(7-i) + j));
             }
         }
     }
     return binary;
 }
 
+char* binaryToString (u_int64_t message)
+{
+    int i;
+    u_int64_t masque = 1;
+    char* result = (char*)malloc(64*sizeof(char)+1); // each char is one byte (8 bits) and + 1 at the end for null terminator
+    result[0] = '\0';
+    for(i=63; i >= 0; i--)
+    {
+	if( message & (masque << i))
+	{
+	    strcat(result, "1");
+	}
+	else
+	{
+	    strcat(result, "0");
+	}
+    }
+    return result;
+}
+
+char asciiConvert(char* message)
+{
+	u_int8_t letter=0;
+	char result;
+	int i;
+	for(i=0; i<8; i++)
+	{
+		if(message[i] == '1')
+		{
+			letter |= 1<<7-i;
+		}
+	}
+	result = letter;
+	return result;
+}
+
+u_int64_t stringTranslate(char* string)
+{
+	u_int64_t result = 0;
+	u_int64_t masque = 1;
+	int i;
+	for (i=0; i<64; i++)
+	{
+		if (string[i]=='1')
+		{
+			result |= (masque << 63-i);
+		}
+	}
+	return result;
+}
+
 char* ecb_crypt(char* message, u_int64_t key)
 {
     size_t i;
     int j;
-    char* result = malloc(64*sizeof(char) + 1);
     size_t len = strlen(message);
-    size_t difference = 8 - len % 8;
-    if (difference != 8)
-    for(i=0; i<len; i++)
+    char* copy = malloc(len + 8*sizeof(char) +1);
+    strcpy(copy, message);
+    for(i=0; i<(8-(len%8)); i++)
     {
-        strcat(message, "X");
+	strcat(copy, "X");
     }
-    len2 = strlen(message)/8;
-    u_int64_t* binary = malloc(64*len2);
-    char** temp = malloc(len2*sizeof(char*))
+    size_t len2 = strlen(copy)/8;
+    char* result = (char*)malloc(64*len2*sizeof(char) + 1);
+    result[0]='\0';
+    char buffer[9];
+    u_int64_t* binary = (u_int64_t*)malloc(len2 * sizeof(u_int64_t));
     for(i=0; i<len2; i++)
     {
-        temp[(int)i]=malloc(8*sizeof(char)+1);
+        memcpy( buffer, &copy[i*8], 8);
+	buffer[8] = '\0';
+	binary[i] = stringToBinary(buffer);
     }
+    u_int64_t plaintext;
     for(i=0; i<len2; i++)
     {
-        for(j=0;j<8;j++)
-        {
-            temp[(int)i][j]=message[((int)i)*8+j];
-        }
-    }
-    for(i=0; i<len2; i++)
-    {
-        binary[(int)i] = des_ciphertext(temp[(int)i], key);
-        for(j=0; j<8; j++)
-        {
-            strcat(result,binary[(int)i][j]);
-        }
+	plaintext = (u_int64_t)binary[(int)i];
+        binary[(int)i] = des_ciphertext(plaintext, key);
+        strcat(result,binaryToString(binary[(int)i]));
     }
     return result;
+}
+
+char* ecb_decrypt(char* message, u_int64_t key)
+{
+	size_t i,cur_len;
+	int j;
+	size_t len = strlen(message)/64;
+	char* result = (char*)malloc(len*8*sizeof(char)+1);
+	result[0]='\0';
+	char** ascii = (char**)malloc(len*sizeof(char*));
+	char buffer[65];
+	char buffer2[9];
+	buffer[64] = '\0';
+	buffer[8] = '\0';
+	char character;
+	for(i=0; i<len; i++)
+	{
+		memcpy(buffer, &message[i*64], 64);
+		ascii[(int)i] = (char*)malloc(64*sizeof(char)+1);
+		ascii[(int)i] = binaryToString(des_plaintext(stringTranslate(buffer),key));
+		for(j=0; j<8; j++)
+		{
+			memcpy(buffer2, &ascii[(int)i][8*j], 64);
+			character = asciiConvert(buffer2);
+			cur_len = strlen(result);
+			result[cur_len] = character;
+			result[cur_len+1] = '\0';
+		}
+	}
+	return result;
 }
