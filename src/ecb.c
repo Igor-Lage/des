@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "ebc.h"
+#include "ecb.h"
 #include "des.h"
 #include "keygen.h"
 
@@ -73,7 +73,7 @@ u_int64_t stringTranslate(char* string)
 	return result;
 }
 
-char* ebc_crypt(char* message, u_int64_t key)
+char* ecb_crypt(char* message, u_int64_t key)
 {
     size_t i;
     int j;
@@ -109,7 +109,7 @@ char* ebc_crypt(char* message, u_int64_t key)
     return result;
 }
 
-char* ebc_decrypt(char* message, u_int64_t key)
+char* ecb_decrypt(char* message, u_int64_t key)
 {
 	size_t i,cur_len;
 	int j;
