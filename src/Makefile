@@ -1,7 +1,7 @@
 CC= gcc
 CXXFLAGS= -Wall -Werror -ansi --pedantic -O3
 
-CPP_O_FILE = keygen.o des.o fk.o ebc.o main.o
+CPP_O_FILE = keygen.o des.o fk.o ecb.o main.o
 LIB = -lm
 
 
