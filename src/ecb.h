@@ -1,5 +1,5 @@
-#ifndef __EBC_H__
-#define __EBC_H__
+#ifndef __ECB_H__
+#define __ECB_H__
 
 #include <stddef.h>
 
@@ -11,8 +11,8 @@ char asciiConvert(char* message);
 
 u_int64_t stringTranslate(char* string);
 
-char* ebc_crypt(char* message, u_int64_t key);
+char* ecb_crypt(char* message, u_int64_t key);
 
-char* ebc_decrypt(char* message, u_int64_t key);
+char* ecb_decrypt(char* message, u_int64_t key);
 
 #endif
