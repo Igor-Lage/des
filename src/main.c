@@ -4,7 +4,7 @@
 #include "fk.h"
 #include "keygen.h"
 #include "des.h"
-#include "ecb.h"
+#include "ebc.h"
 
 
 
@@ -40,10 +40,10 @@ int main(){
 	char* message ="SamyIgorEBC";
 	printf("\nThe message is %s\n",message);
 
-	char* chiffre = ecb_crypt(message, key);
+	char* chiffre = ebc_crypt(message, key);
 	printf("\nThe ciphertext generated from the plaintext is %s",chiffre);
 
-	char* dechiffre = ecb_decrypt(chiffre,key);
+	char* dechiffre = ebc_decrypt(chiffre,key);
 	printf("\n\nThe plaintext generated from the ciphertext is %s",dechiffre);
 	printf("\n");
 	return(0);
