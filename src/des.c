@@ -14,7 +14,6 @@ u_int64_t des_ciphertext(u_int64_t plaintext, u_int64_t key){
 	u_int64_t ciphertext = permutation(plaintext, 1);
 	//The DES algorithm proper, applying the 16 subkeys one by one
 	ciphertext = lr_gen(ciphertext, subkeys);
-	print_bits(ciphertext,64);
 	ciphertext = permutation(ciphertext, -1);
 
 	return(ciphertext);

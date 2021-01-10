@@ -4,6 +4,8 @@
 #include "fk.h"
 #include "keygen.h"
 #include "des.h"
+#include "ecb.h"
+
 
 
 /* The main is here to perform simple tests to make sure everything works fine.
@@ -19,7 +21,7 @@ int main(){
 
 	//64-bit key
 	u_int64_t key = 0x133457799BBCDFF1;
-	plaintext = 0x123456789ABCDEF; /*rand() % 0xFFFFFFFFFFFFFFFF; //(2^64 -1)*/
+	plaintext = rand() % 0xFFFFFFFFFFFFFFFF; //(2^64 -1)
 	printf("The randomly generated plaintext is ");
 	print_bits(plaintext,64);
 
@@ -35,6 +37,14 @@ int main(){
 	print_bits(plaintext, 64);
 
 
+	char* message ="SamyIgorEBC";
+	printf("\nThe message is %s\n",message);
 
+	char* chiffre = ecb_crypt(message, key);
+	printf("\nThe ciphertext generated from the plaintext is %s",chiffre);
+
+	char* dechiffre = ecb_decrypt(chiffre,key);
+	printf("\n\nThe plaintext generated from the ciphertext is %s",dechiffre);
+	printf("\n");
 	return(0);
 }
